@@ -1,0 +1,11 @@
+{
+  "name": "codereadingclub",
+  "version": "1.0.0",
+  "description": "the source code for codereading.club",
+  "repository": "https://github.com/code-reading-club/website",
+  "author": "Meagan Waller <meaganewaller@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  }
+}
