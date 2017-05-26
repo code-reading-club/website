@@ -6,6 +6,17 @@
   "author": "Meagan Waller <meaganewaller@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "gulp": "^3.9.1"
+    "autoprefixer": "^7.1.1",
+    "browser-sync": "^2.18.12",
+    "css-mqpacker": "^6.0.0",
+    "cssnano": "^3.10.0",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-cssmin": "^0.2.0",
+    "gulp-postcss": "^7.0.0",
+    "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-touch": "^1.0.1",
+    "run-sequence": "^1.2.2"
   }
 }
