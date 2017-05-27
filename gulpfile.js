@@ -1,104 +1,209 @@
+// Load All Gulp Plugins
 const gulp         = require('gulp')
-const del          = require('del')
-
-// Styles Related
+const $            = require('gulp-load-plugins')()
+const argv         = require('yargs').argv
 const autoprefixer = require('autoprefixer')
+const babelify     = require('babelify')
+const browserSync  = require('browser-sync')
+const browserify   = require('browserify')
+const buffer       = require('vinyl-buffer')
+const del          = require('del')
+const exec         = require('child_process').exec
+const fs           = require('fs')
+const gulpif       = require('gulp-if')
+const gulpsync     = require('gulp-sync')(gulp);
+const gutil        = require('gulp-util')
+const imagemin     = require('gulp-imagemin')
+const jshint       = require('gulp-jshint')
+const lodash       = require('lodash')
+const notify       = require('gulp-notify')
 const postcss      = require('gulp-postcss')
 const sass         = require('gulp-sass')
-const cssnano      = require('cssnano')
-const mqpacker     = require('css-mqpacker')
-const cssmin       = require('gulp-cssmin')
-const rename       = require('gulp-rename')
+const source       = require('vinyl-source-stream')
 const sourcemaps   = require('gulp-sourcemaps')
-const runSequence  = require('run-sequence')
-const touch        = require('gulp-touch')
-const exec         = require('child_process').exec
-const browserSync  = require('browser-sync').create()
+const stylish      = require('jshint-stylish')
+const uglify       = require('gulp-uglify')
+const watchify     = require('watchify')
 
-const devBuild     = (process.env.NODE_NEV !== 'production')
+const production   = !!argv.production
 
-const source = {
-  styles:  ['source/stylesheets/**/*.scss'],
-  scripts: ['source/javascripts/**/*.js'],
-  images:  ['source/images/**/*']
+const build        = argv._.length ? argv._[0] === 'build' : false
+const watch        = argv._.length ? argv._[0] === 'watch' : true
+
+const reload       = browserSync.reload
+
+const handleError = function(task) {
+  return (err) => {
+    notify.onError({
+      message: task + ' failed, check the logs.',
+      sound: false
+    })(err)
+    gutil.log(gutil.colors.bgRed(task + ' error:'), gutil.colors.red(err))
+  }
 }
 
-const buildDir = 'build'
-const dist = {
-  all: [buildDir   + '/**/*'],
-  css: buildDir    + '/stylesheets/',
-  js: buildDir     + '/js/',
-  images: buildDir + '/images/',
-}
+const src  = 'source/assets'
+const dist = 'source/dist'
 
-gulp.task('default', (callback) => {
-  runSequence('clean', 'styles', ['watch'], callback)
-})
-
-gulp.task('buildProd', (callback) => {
-  runSequence('clean', 'styles', callback)
-})
-
-gulp.task('clean', () =>
-  del(['build/**'])
-)
-
-gulp.task('touchConfig', () => {
-  gulp.src('config.rb').pipe(touch()) // Touch config.rb on gulpfile.js save so Middleman restarts everything.
-})
-
-gulp.task('styles', () => {
-  const cssOptions = [
-    autoprefixer({browsers: ['last 3 versions', '> 2%']}),
-    mqpacker
-  ]
-
-  if (!devBuild) {
-    cssOptions.push(cssnano)
-  }
-
-  gulp.src(source.styles)
-    .pipe(sourcemaps.init())
-    .pipe(sass.sync({
-      outputStyle: 'nested',
-      imagePath: 'images/',
-      precision: 3,
-    }).on('error', sass.logError))
-    .pipe(postcss(cssOptions))
-    .pipe(cssmin())
-    .pipe(rename({suffix: '.min'}))
-    .pipe(sourcemaps.write('maps/'))
-    .pipe(gulp.dest(dist.css))
-    .pipe(browserSync.stream())
-  }
-)
-
-gulp.task('styles:watch', () =>
-  gulp.watch('source/assets/styles/**/*.scss', ['styles'])
-)
-
-gulp.task('watch', ['styles:watch'])
-
-gulp.task('browserSync', ['styles'], () =>
-  browserSync.init({
-    server: {
-      proxy: 'localhost:4567'
+const tasks = {
+  clean: (callback) => {
+    del([ dist, 'temp/' ]).then(() => { callback() })
+  },
+  sass: () => {
+    gulp.src( src + '/stylesheets/**/*.scss')
+    .pipe(gulpif(!production, sourcemaps.init()))
+      .pipe(sass({
+        sourceComments: !production,
+        outputStyle: production ? 'compressed' : 'nested'
+      }))
+      .on('error', sass.logError)
+      .pipe(gulpif(!production, sourcemaps.write({
+        'includeContent': false,
+        'sourceRoot': '.'
+      })))
+      .pipe(gulpif(!production, sourcemaps.init({
+        'loadMaps': true
+      })))
+      .pipe(postcss([autoprefixer({browsers: ['last 2 versions', '> 2%']})]))
+      .pipe(sourcemaps.write({
+        'includeContent': true
+      }))
+      .pipe(gulp.dest( dist + '/stylesheets'))
+  },
+  fonts: () => {
+    gulp.src( src + '/fonts/**/*')
+      .on('error', handleError('fonts'))
+      .pipe(gulp.dest( dist + '/fonts'))
+  },
+  images: () => {
+    gulp.src( src + '/images/**/*')
+      .on('error', handleError('images'))
+      .pipe(gulp.dest( dist + '/images'))
+  },
+  iconfont: () => {
+    gulp.src( src + '/fonts/svg/*.svg')
+      .on('error', handleError('svg'))
+      .pipe($.iconfont({
+        fontName: 'icons',
+        appendCodepoints: false,
+        normalize: true
+      }))
+      .on('glyphs', (glyphs) => {
+        gulp.src('.icon-glyphs-template')
+        .pipe($.template({glyphs: glyphs}))
+        .pipe($.rename("_icon-glyphs.scss"))
+        .pipe(gulp.dest(src + '/stylesheets/variables'))
+      })
+      .pipe(gulp.dest( dist + '/fonts'))
+  },
+  browserify: () => {
+    var bundler = browserify( src + '/javascripts/application.js', {
+      debug: !production,
+      cache: {}
+    })
+    bundler.transform('babelify', {presets: ["es2015"]})
+    var build = argv._.length ? argv._[0] === 'build' : false
+    if (watch) {
+      bundler = watchify(bundler)
+      bundler = bundler
+      .on('update', (time) => {
+        $.util.log('Rebuilding scripts')
+      })
+      .on('log', (msg) => {
+        $.util.log(msg)
+      })
     }
+    var rebundle = () => {
+      bundler.bundle()
+      .on('error', handleError('Browserify'))
+      .pipe(source('application.js'))
+      .pipe(gulpif(production, buffer()))
+      .pipe(gulpif(production, uglify()))
+      .pipe(gulp.dest( dist + '/javascripts'))
+      .pipe(reload({stream:true}))
+    }
+    bundler.on('update', rebundle)
+    return rebundle()
+  },
+  lintjs: () => {
+    return gulp.src([
+      'gulpfile.js',
+      src + '/javascripts/application.js',
+      src + '/javascripts/**/*.js',
+      src + '/javascripts/**/*.es6'
+    ])
+      .pipe(jshint({ esversion: 6 }))
+      .pipe(jshint.reporter(stylish))
+      .on('error', function() {
+        beep()
+      })
+  },
+  optimize: () => {
+    return gulp.src( src + '/images/**/*.{gif,jpg,png,svg}')
+      .pipe(imagemin({
+        progressive: true,
+        svgoPlugins: [{removeViewBox: false}],
+        optimizationLevel: production ? 3 : 1
+      }))
+      .pipe(gulp.dest( dist + '/images'))
+  }
+}
+
+gulp.task('browser-sync', () => {
+  browserSync.init({
+    proxy: 'localhost:4567',
+    reloadDelay: 3500
   })
+})
+
+gulp.task('reload-sass',     ['sass'], () => { browserSync.reload() })
+gulp.task('reload-js',       ['browserify'], () => { browserSync.reload() })
+gulp.task('reload-fonts',    ['fonts'], () => { browserSync.reload() })
+gulp.task('reload-images',   gulpsync.sync(['optimize', 'images']), () => {
+  browserSync.reload()
+})
+gulp.task('reload-icon',     ['iconfont'], () => { browserSync.reload() })
+gulp.task('reload-template', () => { browserSync.reload() })
+
+gulp.task('clean',           tasks.clean)
+gulp.task('runserver',       tasks.runserver)
+gulp.task('sass',            tasks.sass)
+gulp.task('fonts',           tasks.fonts)
+gulp.task('images',          tasks.images)
+gulp.task('iconfont',        tasks.iconfont)
+gulp.task('browserify',      tasks.browserify)
+gulp.task('lint:js',         tasks.lintjs)
+gulp.task('optimize',        tasks.optimize)
+
+gulp.task('watch',
+  gulpsync.sync([
+    'clean',
+    'browser-sync',
+    ['iconfont'],
+    ['fonts', 'images'],
+    ['sass', 'browserify'],
+  ]), () => {
+    gulp.watch( src + '/stylesheets/**/*.{sass,scss}', ['reload-sass'])
+    gulp.watch( src + '/javascripts/**/*.{js,es6}',    ['lint:js'])
+    gulp.watch('source/**/*.{html,slim}',              ['reload-template'])
+    gulp.watch([src + '/fonts/**/*',                   '!source/assets/fonts/svg/**'], ['reload-fonts'])
+    gulp.watch( src + '/fonts/svg/**/*',               ['reload-icon'])
+    gulp.watch([src + '/images/**/*',                  '!source/assets/images/sprites/**'], ['reload-images'])
+    gulp.watch( '**/*.{html,slim,rb,yml}',             ['reload-template'])
+    gutil.log(gutil.colors.bgGreen('Watching for changes...'))
+})
+
+gulp.task('default', ['watch'], () => {
+  browserSync.reload()
+})
+
+gulp.task('build',
+  gulpsync.sync([
+    'clean',
+    'optimize',
+    ['iconfont'],
+    ['fonts', 'images'],
+    'sass',
+    'browserify'
+  ])
 )
-
-gulp.task('build', (cb) => {
-  exec('bundle exec middleman build', (err) => {
-    if (err) return cb(err);
-    cb()
-  })
-})
-
-gulp.task('serve', (cb) => {
-  exec('bundle exec middleman serve', (err) => {
-    if (err) return cb(err);
-    cb()
-  })
-})
-
-gulp.task('default', ['build', 'serve', 'browserSync', 'watch'])
