@@ -7,12 +7,14 @@
   "license": "MIT",
   "browser": {
     "modernizr": "./source/assets/javascripts/vendor/modernizr.js",
-    "jQuery": "./node_modules/jquery/dist/jquery.js"
+    "jQuery": "./node_modules/jquery/dist/jquery.js",
+    "flickity": "./node_modules/flickity/dist/flickity.pkgd.min.js"
   },
   "browserify-shim": {
     "jQuery": "$",
     "modernizr": "Modernizr",
-    "three": "global:THREE"
+    "three": "global:THREE",
+    "flickity": "flickity"
   },
   "browserify": {
     "transform": [
@@ -63,6 +65,7 @@
     "yargs": "^8.0.1"
   },
   "dependencies": {
+    "flickity": "^2.0.7",
     "jquery": "^3.2.1",
     "jquery-ui": "^1.12.1"
   }
