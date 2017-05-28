@@ -32,6 +32,24 @@ const watch        = argv._.length ? argv._[0] === 'watch' : true
 
 const reload       = browserSync.reload
 
+const paths = {
+  scripts: {
+    main:   ['source/assets/javascripts/application.js'],
+    listen: ['source/assets/javascripts/**/*.js'],
+    out:    'source/javascripts'
+  },
+  stylesheets: {
+    main:   ['source/assets/stylesheets/application.sass'],
+    listen: ['source/assets/stylesheets/**/*.sass'],
+    out:    'source/stylesheets'
+  },
+  images: {
+    main:   ['source/assets/images/**/*'],
+    listen: ['source/assets/images/**/*'],
+    out:    'source/images'
+  }
+}
+
 const handleError = function(task) {
   return (err) => {
     notify.onError({
@@ -42,15 +60,9 @@ const handleError = function(task) {
   }
 }
 
-const src  = 'source/assets'
-const dist = 'source/dist'
-
 const tasks = {
-  clean: (callback) => {
-    del([ dist, 'temp/' ]).then(() => { callback() })
-  },
   sass: () => {
-    gulp.src( src + '/stylesheets/**/*.scss')
+    gulp.src(paths.stylesheets.main)
     .pipe(gulpif(!production, sourcemaps.init()))
       .pipe(sass({
         sourceComments: !production,
@@ -68,36 +80,15 @@ const tasks = {
       .pipe(sourcemaps.write({
         'includeContent': true
       }))
-      .pipe(gulp.dest( dist + '/stylesheets'))
-  },
-  fonts: () => {
-    gulp.src( src + '/fonts/**/*')
-      .on('error', handleError('fonts'))
-      .pipe(gulp.dest( dist + '/fonts'))
+      .pipe(gulp.dest(paths.stylesheets.out))
   },
   images: () => {
-    gulp.src( src + '/images/**/*')
+    gulp.src(paths.images.main)
       .on('error', handleError('images'))
-      .pipe(gulp.dest( dist + '/images'))
-  },
-  iconfont: () => {
-    gulp.src( src + '/fonts/svg/*.svg')
-      .on('error', handleError('svg'))
-      .pipe($.iconfont({
-        fontName: 'icons',
-        appendCodepoints: false,
-        normalize: true
-      }))
-      .on('glyphs', (glyphs) => {
-        gulp.src('.icon-glyphs-template')
-        .pipe($.template({glyphs: glyphs}))
-        .pipe($.rename("_icon-glyphs.scss"))
-        .pipe(gulp.dest(src + '/stylesheets/variables'))
-      })
-      .pipe(gulp.dest( dist + '/fonts'))
+      .pipe(gulp.dest(paths.images.out))
   },
   browserify: () => {
-    var bundler = browserify( src + '/javascripts/application.js', {
+    var bundler = browserify(paths.scripts.main, {
       debug: !production,
       cache: {}
     })
@@ -119,7 +110,7 @@ const tasks = {
       .pipe(source('application.js'))
       .pipe(gulpif(production, buffer()))
       .pipe(gulpif(production, uglify()))
-      .pipe(gulp.dest( dist + '/javascripts'))
+      .pipe(gulp.dest(paths.scripts.out))
       .pipe(reload({stream:true}))
     }
     bundler.on('update', rebundle)
@@ -128,9 +119,8 @@ const tasks = {
   lintjs: () => {
     return gulp.src([
       'gulpfile.js',
-      src + '/javascripts/application.js',
-      src + '/javascripts/**/*.js',
-      src + '/javascripts/**/*.es6'
+      paths.scripts.main,
+      paths.scripts.listen
     ])
       .pipe(jshint({ esversion: 6 }))
       .pipe(jshint.reporter(stylish))
@@ -139,13 +129,13 @@ const tasks = {
       })
   },
   optimize: () => {
-    return gulp.src( src + '/images/**/*.{gif,jpg,png,svg}')
+    return gulp.src(paths.images.out)
       .pipe(imagemin({
         progressive: true,
         svgoPlugins: [{removeViewBox: false}],
         optimizationLevel: production ? 3 : 1
       }))
-      .pipe(gulp.dest( dist + '/images'))
+      .pipe(gulp.dest(paths.images.out))
   }
 }
 
@@ -158,38 +148,26 @@ gulp.task('browser-sync', () => {
 
 gulp.task('reload-sass',     ['sass'], () => { browserSync.reload() })
 gulp.task('reload-js',       ['browserify'], () => { browserSync.reload() })
-gulp.task('reload-fonts',    ['fonts'], () => { browserSync.reload() })
 gulp.task('reload-images',   gulpsync.sync(['optimize', 'images']), () => {
   browserSync.reload()
 })
-gulp.task('reload-icon',     ['iconfont'], () => { browserSync.reload() })
-gulp.task('reload-template', () => { browserSync.reload() })
 
-gulp.task('clean',           tasks.clean)
 gulp.task('runserver',       tasks.runserver)
 gulp.task('sass',            tasks.sass)
-gulp.task('fonts',           tasks.fonts)
-gulp.task('images',          tasks.images)
-gulp.task('iconfont',        tasks.iconfont)
 gulp.task('browserify',      tasks.browserify)
 gulp.task('lint:js',         tasks.lintjs)
+gulp.task('images',          tasks.images)
 gulp.task('optimize',        tasks.optimize)
 
 gulp.task('watch',
   gulpsync.sync([
-    'clean',
     'browser-sync',
-    ['iconfont'],
-    ['fonts', 'images'],
+    ['images'],
     ['sass', 'browserify'],
   ]), () => {
-    gulp.watch( src + '/stylesheets/**/*.{sass,scss}', ['reload-sass'])
-    gulp.watch( src + '/javascripts/**/*.{js,es6}',    ['lint:js'])
-    gulp.watch('source/**/*.{html,slim}',              ['reload-template'])
-    gulp.watch([src + '/fonts/**/*',                   '!source/assets/fonts/svg/**'], ['reload-fonts'])
-    gulp.watch( src + '/fonts/svg/**/*',               ['reload-icon'])
-    gulp.watch([src + '/images/**/*',                  '!source/assets/images/sprites/**'], ['reload-images'])
-    gulp.watch( '**/*.{html,slim,rb,yml}',             ['reload-template'])
+    gulp.watch(paths.stylesheets.listen, ['reload-sass'])
+    gulp.watch(paths.scripts.listen, ['lint:js'])
+    gulp.watch(paths.images.listen,      ['reload-images'])
     gutil.log(gutil.colors.bgGreen('Watching for changes...'))
 })
 
@@ -199,10 +177,8 @@ gulp.task('default', ['watch'], () => {
 
 gulp.task('build',
   gulpsync.sync([
-    'clean',
+    ['images'],
     'optimize',
-    ['iconfont'],
-    ['fonts', 'images'],
     'sass',
     'browserify'
   ])

@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
 gem 'middleman', '~> 4.2'
-gem "middleman-minify-html"
 
 gem "slim"
 
