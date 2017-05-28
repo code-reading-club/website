@@ -81,6 +81,7 @@ const tasks = {
         'includeContent': true
       }))
       .pipe(gulp.dest(paths.stylesheets.out))
+      .pipe(browserSync.stream())
   },
   images: () => {
     gulp.src(paths.images.main)
@@ -141,12 +142,11 @@ const tasks = {
 
 gulp.task('browser-sync', () => {
   browserSync.init({
-    proxy: 'localhost:4567',
-    reloadDelay: 3500
+    proxy: 'localhost:4567'
   })
 })
 
-gulp.task('reload-sass',     ['sass'], () => { browserSync.reload() })
+gulp.task('reload-sass',     ['sass'])
 gulp.task('reload-js',       ['browserify'], () => { browserSync.reload() })
 gulp.task('reload-images',   gulpsync.sync(['optimize', 'images']), () => {
   browserSync.reload()
@@ -166,7 +166,7 @@ gulp.task('watch',
     ['sass', 'browserify'],
   ]), () => {
     gulp.watch(paths.stylesheets.listen, ['reload-sass'])
-    gulp.watch(paths.scripts.listen, ['lint:js'])
+    gulp.watch(paths.scripts.listen,     ['lint:js'])
     gulp.watch(paths.images.listen,      ['reload-images'])
     gutil.log(gutil.colors.bgGreen('Watching for changes...'))
 })
