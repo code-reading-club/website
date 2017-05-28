@@ -4,16 +4,17 @@ page '/*.xml',  layout: false
 page '/*.json', layout: false
 page '/*.txt',  layout: false
 
-# # Assets
-# set :css_dir,    "dist/stylesheets"
-# set :images_dir, "dist/images"
-# set :js_dir,     "dist/javascripts"
-
 activate :external_pipeline,
   name: :gulp,
   command: build? ? 'gulp build --production' : './node_modules/gulp/bin/gulp.js',
   source: "dist",
   latency: 1
+
+activate :blog do |blog|
+  blog.prefix = "blog"
+end
+
+activate :directory_indexes
 
 configure :build do
   ignore 'assets/*'

@@ -1,8 +1,9 @@
 source 'https://rubygems.org'
 
-gem 'middleman', '~> 4.2'
+gem 'middleman',      '~> 4.2'
+gem 'middleman-blog', '~> 4.0'
 
-gem "slim"
+gem 'slim'
 
 group :test, :development do
   gem 'rspec'
