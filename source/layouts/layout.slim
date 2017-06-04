@@ -2,5 +2,20 @@ doctype html
 html
   head= partial "partials/head"
   body
+    header#header.header.primary
+      a.logo href="/" title="Back to the homepage"
+        | Code Reading Club
+      nav#nav.nav
+        a.nav-item href="/" Home
+        a.nav-item href="/blog" Blog
+        a.nav-item href="/about" About
+        a.nav-item href="/guides" Guides
+        a.nav-item href="/first-time" Start Here
+      form#search.form.form-search method="post" action="/"
+        .field.field-whole.field-search
+          label.visuallyhidden for="keywords" Search
+          input#keywords.input.input-search name="keywords" placeholder="find a post..." autocorrect="off" autocapitalize="off" required="" type="search"
+          button.button.button-search type="submit"
+            span.icon.icon-medium.icon-large-d.icon-search
     = yield
     = javascript_include_tag :application

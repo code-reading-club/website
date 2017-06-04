@@ -1,0 +1,14 @@
+article.card.entry
+  | a.card-image href= #{article.url}"
+    | img data-src="#{article.featured_image}"
+  .card-body
+    .meta
+      =time datetime="#{article.datestrftime('%b %e %Y')}" "#{article.date.strftime('%b %e %Y')}"
+    h3.primary
+      | a href=#{article.url}
+        | #{article.title}
+    p
+      | #{article.description}
+    .meta
+      | a rel="category tag" href="categories/#{article.category}" #{article.category}
+      | a.link-icon href="#{article.url}" Continue reading

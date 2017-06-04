@@ -1,0 +1,6 @@
+name: Code Reading Club
+description: Become literate in your favorite languages, libraries, and more.
+image: /img/siteimage.png
+dark_image: /img/siteimage_dark.png
+feed_link: //feed.codereading.club/feed.xml
+feed_rss_link: //feed.codereading.club/feed.rss.xml

@@ -1,7 +1,30 @@
----
-title: Welcome to Middleman
----
+.hero
+  .introduction
+    h1.primary.hero-title
+      img src="/images/hero.svg" alt="Learn by reading"
+  picture.hero-image
+    source srcset="/images/introduction-320.svg" media="(max-width: 399px)" sizes="100vw"
+    source srcset="/images/introduction-394.svg" media="(min-width: 400px) and (max-width: 733px)" sizes="100vw"
+    source srcset="/images/introduction-734.svg" media="(min-width: 734px) and (max-width: 1133px)" sizes="100vw"
+    source srcset="/images/introduction-960.svg" media="(min-width: 1134px)"
+    img src="/images/introduction-960.svg"
 
-.wrap
-  .formatted-content
-    h1 Hello world
+= partial "partials/posts-scroll", locals: { title: "Recent posts" }
+  - blog.articles[0...5].each do |article|
+    = partial "partials/posts-scoll-card", locals: { article: article }
+    / - blog.articles[0...5].each do |article|
+    /   article.card.entry
+    /     | a.card-image href= #{article.url}"
+    /       | img data-src="#{article.featured_image}"
+    /     .card-body
+    /       .meta
+    /         =time datetime="#{article.datestrftime('%b %e %Y')}" "#{article.date.strftime('%b %e %Y')}"
+    /       h3.primary
+    /         | a href=#{article.url}
+    /           | #{article.title}
+    /       p
+    /         | #{article.description}
+    /       .meta
+    /         | a rel="category tag" href="categories/#{article.category}" #{article.category}
+    /         | a.link-icon href="#{article.url}" Continue reading
+= partial "partials/posts-scroll", locals: { title: "Popular in ruby" }
