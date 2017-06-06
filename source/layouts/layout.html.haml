@@ -1,0 +1,253 @@
+!!!
+%html
+  %head
+    = partial "partials/head"
+  %body{ class: page_classes }
+    .loader-mask
+      .loader
+        %div
+        %div
+        %div
+    %section.sidenav
+      %h6 About Us
+      %p
+        Email:
+        %a(title="Email us" href="mailto:staff@codereading.club") staff@codereading.club
+      %h6 Useful Links
+      %ul.links-list.nopadding
+        %li
+          %a(title="First time here? Start here" href="#") First time here?
+        %li
+          %a(title="About us" href="#") About us
+        %li
+          %a(title="Guides" href="#") Guides
+        %li
+          %a(title="Blog" href="#") Blog
+      %div.social-icons.dark.rounded.mt-40
+        %a(title="Twitter" href="#")
+          %i.fa.fa-twitter
+        %a(title="Facebook" href="#")
+          %i.fa.fa-facebook
+        %a(title="Youtube" href="#")
+          %i.fa.fa-youtube
+        %a(title="Instagram" href="#")
+          %i.fa.fa-instagram
+      %a(href="#" id="sidenav-close")
+        %i.ti-close
+    %div.main-wrapper
+      %header.nav-type-1.transparent
+        %div.search-wrap
+          %div.search-inner
+            %div.search-cell
+              %form(method="get")
+                %div.search-field-holder
+                  %input(type="search" class="form-control main-search-input" placeholder="Search for")
+                  %input(type="submit" class="search-submit" value="")
+          %i.icon-close.search-close#search-close
+        %nav.navbar.navbar-static-top
+          %div.navigation
+            %div.container-fluid.semi-fluid.relative
+              %div.row
+                %div.navbar-header
+                  %div.logo-container
+                    %div.logo-wrap
+                      %a(href="/" title="Go to homepage")
+                        %img(class="logo" src="images/logo_light.png" alt="Logo")
+                        %img(class="logo-dark" src="images/logo_dark.png" alt="Logo")
+                  %button(type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse")
+                    %span.sr-only Toggle navigation
+                    %span.icon-bar
+                    %span.icon-bar
+                    %span.icon-bar
+                %div.col-md-12.nav-wrap
+                  %div.collapse.navbar-collapse.text-center#navbar-collapse
+                    %ul.nav.navbar-nav
+                      %li.active
+                        %a(href="#" title="Home") Home
+                      %li.dropdown
+                        %a(href="#" class="dropdown-toggle" data-toggle="dropdown") Pages
+                        %ul.dropdown-menu
+                          %li.dropdown-submenu
+                            %a(href="#" class="dropdown-toggle") Services
+                            %ul.dropdown-menu
+                              %li
+                                %a(href="#") Services 1
+                              %li
+                                %a(href="#") Services 2
+                          %li.dropdown-submenu
+                            %a(href="#" class="dropdown-toggle") About Us
+                            %ul.dropdown-menu
+                              %li
+                                %a(href="#") About Us 1
+                              %li
+                                %a(href="#") About Us 2
+                          %li.dropdown-submenu
+                            %a(href="#" class="dropdown-toggle") Contact
+                            %ul.dropdown-menu
+                              %li
+                                %a(href="#") Contact 1
+                              %li
+                                %a(href="#") Contact 2
+                      %li.dropdown
+                        %a(href="#" class="dropdown-toggle" data-toggle="dropdown") Guides
+                        %ul.dropdown-menu
+                          %li.dropdown-submenu
+                            %a(href="#" class="dropdown-toggle") Classic
+                            %ul.dropdown-menu
+                              %li
+                                %a(href="#") 4 Columns
+                              %li
+                                %a(href="#") 3 Columns
+                              %li
+                                %a(href="#") 2 Column
+                          %li.dropdown-submenu
+                            %a(href="#" class="dropdown-toggle") Fullwidth
+                            %ul.dropdown-menu
+                              %li
+                                %a(href="#") 5 Columns
+                              %li
+                                %a(href="#") 4 Columns
+                              %li
+                                %a(href="#") 3 Columns
+                              %li
+                                %a(href="#") 2 Columns
+                          %li.dropdown-submenu
+                            %a(href="#" class="dropdown-toggle") Masonry
+                            %ul.dropdown-menu
+                              %li
+                                %a(href="#") 5 Columns
+                              %li
+                                %a(href="#") 5 Columns
+                              %li
+                                %a(href="#") 4 Columns
+                              %li
+                                %a(href="#") 3 Columns
+                              %li
+                                %a(href="#") 2 Columns
+                          %li.dropdown-submenu
+                            %a(href="#" class="dropdown-toggle") With Title
+                            %ul.dropdown-menu
+                              %li
+                                %a(href="#") 5 Columns
+                              %li
+                                %a(href="#") 5 Columns
+                              %li
+                                %a(href="#") 4 Columns
+                              %li
+                                %a(href="#") 3 Columns
+                              %li
+                                %a(href="#") 2 Columns
+                          %li.dropdown-submenu
+                            %a(href="#" class="dropdown-toggle") Single Project
+                            %ul.dropdown-menu
+                              %li
+                                %a(href="#") Standard
+                              %li
+                                %a(href="#") Extended
+                      %li.dropdown
+                        %a(href="#" class="dropdown-toggle") Blog
+                        %ul.dropdown-menu
+                          %li
+                            %a(href="#") Standard
+                          %li
+                            %a(href="#") Masonry
+                          %li
+                            %a(href="#") Single Post
+                          %li
+                            %a(href="#") No Sidebar
+                      %li.dropdown
+                        %a(href="#" class="dropdown-toggle" data-toggle="dropdown") Features
+                        %ul.dropdown-menu.megamenu
+                          %li
+                            %div.megamenu-wrap
+                              %div.row
+                                %div.col-md-3.megamenu-item.no-headings
+                                  %ul.menu-list
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-arrow-circle-o-down
+                                          Accordions &amp; Toggles
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-exclamation-triangle
+                                          Alert Boxes
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-forward
+                                          Animations
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-hand-o-up
+                                          Buttons
+                                %div.col-md-3.megamenu-item.no-headings
+                                  %ul.menu-list
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-columns
+                                          Columns
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-sort-numeric-desc
+                                          Counters
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-pencil-square-o
+                                          Form Elements
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-image
+                                          Lightboxes
+                                %div.col-md-3.megamenu-item.no-headings
+                                  %ul.menu-list
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-columns
+                                          Columns
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-sort-numeric-desc
+                                          Counters
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-pencil-square-o
+                                          Form Elements
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-image
+                                          Lightboxes
+                                %div.col-md-3.megamenu-item.no-headings
+                                  %ul.menu-list
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-columns
+                                          Columns
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-sort-numeric-desc
+                                          Counters
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-pencil-square-o
+                                          Form Elements
+                                    %li
+                                      %a(href="#")
+                                        %i.fa.fa-image
+                                          Lightboxes
+                      %li.hidden-lg.hidden-md#mobile-search
+                        %form(method="get" class="mobile-search")
+                          %input(type="search" class="form-control" placeholder="Search...")
+                          %button(type="submit" class="search-button")
+                            %i.fa.fa-search
+                %ul.nav-right.hidden-sm.hidden-xs
+                  %li.nav-search-wrap
+                    %a(href="#" class="nav-search")
+                      %i.icon-magnifier.search-trigger
+                  %li.nav-icon-trigger
+                    %a(href="#" id="nav-icon")
+                      %div.nav-icon-innner
+                        %div.nav-icon-wrap
+                          %span
+                          %span
+                          %span
+                          %span
+      = yield
